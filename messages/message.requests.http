@@ -7,7 +7,7 @@ POST http://localhost:3000/messages
 Content-Type: application/json
 
 {
-    "content":"hi there"
+    "content":"hi there4"
 }
 
 ### Create a new message 오류 체크 (string아니면 오류남)
@@ -19,8 +19,6 @@ Content-Type: application/json
 }
 
 
-
-
 ### Get a particular message
-GET http://localhost:3000/messages/1
+GET http://localhost:3000/messages/268
 

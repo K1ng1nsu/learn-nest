@@ -1,0 +1,102 @@
+### pipe, guard, controller, service, repository ###
+######               module                   ######
+
+
+### DI (의존성 주입)
+- 싱글톤으로 생성 (default)
+
+@Injectable at Class of Service & Repository
+
+Module에 provider로 등록
+
+### 모듈간 DI 설정
+- 모듈에 exports 에 추가 되지 않은 것들은 다른 모듈에서 사용 불가능
+- 모듈에 exports 배열에 export 할 클래스 등록
+- 다른 모듈에서 import module 하고 imports 배열에 모듈 등록
+
+
+### 에러처리
+throw new ***Exception
+
+
+### 입력값 검증 (PIPE)
+npm install class-validator
+npm install class-transformer
+
+dto 만들고 class-validator 어노테이션 적용
+
+
+### 컨트롤러에서 사용한 어노테이션
+@Controller('messages')
+@Get
+@Get('/:id') => @Param('id') id: string
+@Post => @Body로 데이터 받음 => createMessage(@Body() body: CreateMessageDto) { // dto로 받으면서 데이터검증
+// 데이터 받기
+@Query
+@Body
+@Param
+
+
+
+### pipe 적용
+- 1. 글로벌 파이프 적용 main.ts 에서 app.useGlobalPipes(new ValidationPipe());
+- 2. 컨트롤러에 적용 
+@UsePipes(new ValidationPipe()) // ValidationPipe 적용 
+createUser(@Body() createUserDto: CreateUserDto) // CreateUserDto 에 어노테이션
+- 3. 특정 파라미터에 Pipe 적용
+@Get(':id')
+getItem(@Param('id', ParseIntPipe) id: number) { // id를 정수로 변환
+
+### 내장 pipe
+파이프	         설명	                          예외 발생 조건
+ValidationPipe	DTO를 사용한 데이터 유효성 검사	   DTO 조건 위반 시
+ParseIntPipe	문자열을 정수로 변환	           변환 불가 시
+ParseBoolPipe	문자열을 불리언으로 변환	       true, false, 1, 0 외 값
+ParseFloatPipe	문자열을 실수로 변환	           변환 불가 시
+DefaultValuePipe	기본값 제공	                       -
+ParseArrayPipe	문자열을 배열로 변환	           변환 불가하거나, 각 요소가 유효하지 않을 때
+
+
+### 커스텀 pipe
+커스텀 파이프는 PipeTransform 인터페이스를 구현해야 하며, 주로 다음 두 가지를 처리합니다:
+1. 데이터 변환 (Transformation)
+2. 유효성 검사 (Validation)
+import { PipeTransform, Injectable, ArgumentMetadata, BadRequestException } from '@nestjs/common';
+
+@Injectable()
+export class CustomPipe implements PipeTransform {
+  transform(value: any, metadata: ArgumentMetadata) {
+    // 유효성 검사 예: 숫자 여부 확인
+    if (isNaN(value)) {
+      throw new BadRequestException('Value must be a number');
+    }
+    // 데이터 변환 예: 숫자로 변환
+    return Number(value);
+  }
+}
+
+transform(value, metadata)
+
+transform() 메서드는 데이터를 처리하는 핵심 부분입니다. 두 가지 매개변수를 사용합니다:
+
+    value: 클라이언트로부터 전달받은 입력값.
+    metadata: 요청의 메타데이터(ArgumentMetadata)로, 아래와 같은 정보를 포함합니다:
+        type: 입력값의 타입 (body, query, param 등).
+        metatype: 입력 데이터의 원래 클래스 또는 타입.
+        data: 요청에서 사용된 키.
+예시
+{
+  type: 'param',
+  metatype: String,
+  data: 'id'
+}
+
+// 사용
+- 여러개면 순서대로 적용용
+/ 커스텀 파이프 적용 @Query나 @Body @Param
+@UsePipes(new CustomPipe()) // 메서드 전체에 파이프 적용
+app.useGlobalPipes(new CustomPipe()); // 글로벌 커스텀 파이프 적용
+@Get(':id')
+  getItem(@Param('id', ####CustomPipe####) id: number) { /
+    return `Item ID: ${id}`;
+  }
