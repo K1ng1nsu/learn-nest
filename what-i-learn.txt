@@ -15,10 +15,6 @@ Module에 provider로 등록
 - 다른 모듈에서 import module 하고 imports 배열에 모듈 등록
 
 
-### 에러처리
-throw new ***Exception
-
-
 ### 입력값 검증 (PIPE)
 npm install class-validator
 npm install class-transformer
@@ -39,7 +35,11 @@ dto 만들고 class-validator 어노테이션 적용
 
 
 ### pipe 적용
-- 1. 글로벌 파이프 적용 main.ts 에서 app.useGlobalPipes(new ValidationPipe());
+- 1. 글로벌 파이프 적용 main.ts 에서 app.useGlobalPipes(new ValidationPipe(
+  {
+    whitelist:true, // createUser(@Body() createUserDto: CreateUserDto) 에서 dto에 없는 내용이 넘어오는걸 방지함(오류는 안나고 컨트롤러가 받을것만 받음)
+  }
+));
 - 2. 컨트롤러에 적용 
 @UsePipes(new ValidationPipe()) // ValidationPipe 적용 
 createUser(@Body() createUserDto: CreateUserDto) // CreateUserDto 에 어노테이션
@@ -92,7 +92,7 @@ transform() 메서드는 데이터를 처리하는 핵심 부분입니다. 두 �
 }
 
 // 사용
-- 여러개면 순서대로 적용용
+- 여러개면 순서대로 적용
 / 커스텀 파이프 적용 @Query나 @Body @Param
 @UsePipes(new CustomPipe()) // 메서드 전체에 파이프 적용
 app.useGlobalPipes(new CustomPipe()); // 글로벌 커스텀 파이프 적용
@@ -100,3 +100,19 @@ app.useGlobalPipes(new CustomPipe()); // 글로벌 커스텀 파이프 적용
   getItem(@Param('id', ####CustomPipe####) id: number) { /
     return `Item ID: ${id}`;
   }
+
+
+
+
+### db 연결
+  - TypeORM 사용  => RDBMS & NOSQL
+  - Mongoose 사용 => mongoDB only
+
+
+### 에러 처리
+  - service 단에서는 http에 종속된 오류를 던지지 않는 것이 좋다.
+  - 따라서 controller에서 http에 종속된 오류를 처리한다. 
+  - 1. 각 계층의 분리를 위해서 - 단일 책임의 원칙 준수
+  - 2. 각 계층이 분리되면 독립적으로 테스트를 할 수 있음. - 낮은 결합도, 테스트 용이성
+  - 3. 서비스 로직의 재사용성이 늘어남 -- gRPC, MessageQueue, WebSocket, Batch - 유연성 향상
+  - 4. 일관된 에러처리
