@@ -116,3 +116,37 @@ app.useGlobalPipes(new CustomPipe()); // 글로벌 커스텀 파이프 적용
   - 2. 각 계층이 분리되면 독립적으로 테스트를 할 수 있음. - 낮은 결합도, 테스트 용이성
   - 3. 서비스 로직의 재사용성이 늘어남 -- gRPC, MessageQueue, WebSocket, Batch - 유연성 향상
   - 4. 일관된 에러처리
+
+
+
+### 특정 속성을 숨기기
+  - User의 password 속성 등
+
+  # 방법 1. 
+  - 엔티티에 테코레이터 추가 =>import { Exclude } from 'class-transformer';
+  - 컨트롤러가 리턴하는 엔티티 인스턴스를 인터셉터로 가로채서 일반객체로 변환
+  - 컨트롤러에 데코레이터 추가 =>   UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
+
+## 엔티티에 데코레이터 추가
+import { Exclude } from 'class-transformer';
+
+  @Column()
+  @Exclude()
+  password: string;
+
+## 컨트롤러에 데코레이터 추가
+
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get('/:id')
+  async findUser(@Param('id', ParseIntPipe) id: string) {
+
+    
+  # 방법 2. custom interceptor => IT'S BETTER
+  - => custom-intercept.txt 
+
+### Custom interceptor
+
+## 적용 범위
+  1. 컨트롤러 메소드
+  2. 컨트롤러 전체
+  3. 글로벌

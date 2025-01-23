@@ -1,0 +1,20 @@
+### 데코레이터
+    - 데코레이터는 그냥 함수임
+
+### 데코레이터 종류
+  1. 클래스 데코레이터
+  2. 메서드 데코레이터
+  3. 속성 데코레이터(클래스의 속성)
+  4. 매개변수 데코레이터
+
+
+## 기존 데코레이터의 연장, 캡슐화
+
+
+interface ClassConstructor { // 어떤클래스든 클래스면 만족함함
+  new (...args: any[]): {};
+}
+
+export function Serialize(dto: ClassConstructor) {
+  return UseInterceptors(new SerializeInterceptor(dto)); // custom decorator(SerializeInterceptor)를 적용한 모습
+}
